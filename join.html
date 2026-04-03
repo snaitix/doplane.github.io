@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doplane — Присоединиться к семье</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        }
+        .icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .family-name {
+            font-size: 17px;
+            color: #007AFF;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-secondary {
+            display: inline-block;
+            margin-top: 12px;
+            color: #007AFF;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .status {
+            margin-top: 16px;
+            font-size: 13px;
+            color: #999;
+        }
+        .error {
+            color: #FF3B30;
+            font-size: 15px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="card">
+        <div class="icon">👨‍👩‍👧‍👦</div>
+        <h1 id="title">Присоединиться к семье</h1>
+        <div class="family-name" id="familyName"></div>
+        <p id="desc">Нажмите кнопку, чтобы открыть приглашение в приложении Doplane.</p>
+        <button class="btn" id="openBtn" onclick="openApp()">Открыть в Doplane</button>
+        <a class="btn-secondary" id="storeLink" href="https://apps.apple.com/app/doplane" style="display:none;">Скачать Doplane</a>
+        <div class="status" id="status"></div>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        var params = new URLSearchParams(window.location.search);
+        var familyId = params.get('id');
+        var token = params.get('token');
+        var familyName = params.get('name');
+
+        if (!familyId || !token) {
+            document.getElementById('error').textContent = 'Неверная ссылка приглашения.';
+            document.getElementById('openBtn').style.display = 'none';
+        } else {
+            if (familyName) {
+                document.getElementById('familyName').textContent = decodeURIComponent(familyName);
+            }
+        }
+
+        function buildDeepLink() {
+            var name = familyName ? encodeURIComponent(familyName) : 'Family';
+            return 'doplane://family/join/' + familyId + '/' + token + '/' + name;
+        }
+
+        function openApp() {
+            if (!familyId || !token) return;
+            var deepLink = buildDeepLink();
+            var start = Date.now();
+
+            window.location.href = deepLink;
+
+            setTimeout(function() {
+                if (Date.now() - start < 2000) {
+                    document.getElementById('status').textContent = 'Приложение не найдено. Установите Doplane из App Store.';
+                    document.getElementById('storeLink').style.display = 'inline-block';
+                }
+            }, 1500);
+        }
+
+        // Auto-open on load
+        if (familyId && token) {
+            setTimeout(openApp, 500);
+        }
+    </script>
+</body>
+</html>
