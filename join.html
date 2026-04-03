@@ -35,28 +35,13 @@
             margin: 0 auto 20px;
             font-size: 36px;
         }
-        h1 {
-            font-size: 22px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-        }
-        .family-name {
-            font-size: 17px;
-            color: #007AFF;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 15px;
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 24px;
-        }
+        h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+        .family-name { font-size: 17px; color: #007AFF; font-weight: 500; margin-bottom: 20px; }
+        p { font-size: 15px; color: #666; line-height: 1.5; margin-bottom: 24px; }
         .btn {
-            display: inline-block;
+            display: block;
             background: linear-gradient(135deg, #007AFF, #5856D6);
-            color: white;
+            color: white !important;
             text-decoration: none;
             padding: 14px 32px;
             border-radius: 14px;
@@ -66,37 +51,33 @@
             border: none;
             cursor: pointer;
             transition: transform 0.15s;
+            -webkit-appearance: none;
         }
         .btn:active { transform: scale(0.97); }
-        .btn-secondary {
-            display: inline-block;
+        .btn-store {
+            display: block;
             margin-top: 12px;
-            color: #007AFF;
+            background: #f5f5f7;
+            color: #007AFF !important;
             text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
             font-size: 15px;
             font-weight: 500;
         }
-        .status {
-            margin-top: 16px;
-            font-size: 13px;
-            color: #999;
-        }
-        .error {
-            color: #FF3B30;
-            font-size: 15px;
-            margin-top: 12px;
-        }
+        .hint { margin-top: 16px; font-size: 13px; color: #999; }
+        .error { color: #FF3B30; font-size: 15px; margin-top: 12px; }
     </style>
 </head>
 <body>
-    <div class="card" id="card">
+    <div class="card">
         <div class="icon">👨‍👩‍👧‍👦</div>
         <h1 id="title">Присоединиться к семье</h1>
         <div class="family-name" id="familyName"></div>
         <p id="desc">Нажмите кнопку, чтобы открыть приглашение в приложении Doplane.</p>
-        <button class="btn" id="openBtn" onclick="openApp()">Открыть в Doplane</button>
-        <a class="btn-secondary" id="storeLink" href="https://apps.apple.com/app/doplane" style="display:none;">Скачать Doplane</a>
-        <div class="status" id="status"></div>
+        <a class="btn" id="openBtn" href="#">Открыть в Doplane</a>
+        <a class="btn-store" id="storeLink" href="https://apps.apple.com/app/doplane" style="display:none;">Скачать Doplane из App Store</a>
+        <div class="hint" id="hint"></div>
         <div class="error" id="error"></div>
     </div>
 
@@ -109,35 +90,25 @@
         if (!familyId || !token) {
             document.getElementById('error').textContent = 'Неверная ссылка приглашения.';
             document.getElementById('openBtn').style.display = 'none';
+            document.getElementById('desc').style.display = 'none';
         } else {
             if (familyName) {
                 document.getElementById('familyName').textContent = decodeURIComponent(familyName);
             }
-        }
 
-        function buildDeepLink() {
             var name = familyName ? encodeURIComponent(familyName) : 'Family';
-            return 'doplane://family/join/' + familyId + '/' + token + '/' + name;
-        }
+            var deepLink = 'doplane://family/join/' + familyId + '/' + token + '/' + name;
+            document.getElementById('openBtn').href = deepLink;
 
-        function openApp() {
-            if (!familyId || !token) return;
-            var deepLink = buildDeepLink();
-            var start = Date.now();
-
-            window.location.href = deepLink;
-
-            setTimeout(function() {
-                if (Date.now() - start < 2000) {
-                    document.getElementById('status').textContent = 'Приложение не найдено. Установите Doplane из App Store.';
-                    document.getElementById('storeLink').style.display = 'inline-block';
-                }
-            }, 1500);
-        }
-
-        // Auto-open on load
-        if (familyId && token) {
-            setTimeout(openApp, 500);
+            document.getElementById('openBtn').addEventListener('click', function(e) {
+                var start = Date.now();
+                setTimeout(function() {
+                    if (Date.now() - start < 2000) {
+                        document.getElementById('hint').textContent = 'Если приложение не открылось, установите Doplane из App Store.';
+                        document.getElementById('storeLink').style.display = 'block';
+                    }
+                }, 1000);
+            });
         }
     </script>
 </body>
